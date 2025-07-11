@@ -17,6 +17,9 @@ interface ROIResult {
   profit: number
   roi: number
   period: string
+  dateUsed: string
+  historicalPrice: number
+  currentPrice: number
 }
 
 interface CryptoOption {
@@ -62,15 +65,25 @@ export function ROICalculator() {
       ])
 
       if (!cryptoResponse.ok || !historicalResponse.ok) {
+        console.error("API fetch failed:", { cryptoStatus: cryptoResponse.status, historicalStatus: historicalResponse.status })
         throw new Error("Failed to fetch data")
       }
 
       const cryptoData = await cryptoResponse.json()
-      const historicalPrices = await historicalResponse.json()
+      const historicalPricesResponse = await historicalResponse.json()
+      console.log("[ROI DEBUG] /api/crypto-data response:", cryptoData)
+      console.log("[ROI DEBUG] /api/crypto-historical response:", historicalPricesResponse)
+      const prices = historicalPricesResponse.data || {}
 
-      // Find current crypto data
-      const crypto = cryptoData.find((c: any) => c.id === selectedCrypto)
+      // Find current crypto data (fix: use cryptoData.data)
+      const cryptoList = cryptoData.data || []
+      if (!Array.isArray(cryptoList)) {
+        console.error("[ROI DEBUG] cryptoData.data is not an array", cryptoData)
+        throw new Error("Malformed crypto data from API")
+      }
+      const crypto = cryptoList.find((c: any) => c.id === selectedCrypto)
       if (!crypto) {
+        console.error("[ROI DEBUG] Cryptocurrency not found in data", { selectedCrypto, cryptoList })
         throw new Error("Cryptocurrency not found")
       }
 
@@ -82,17 +95,32 @@ export function ROICalculator() {
       ]
 
       const newResults: ROIResult[] = periods.map((period) => {
-        const historicalPrice = historicalPrices[period.key] || crypto.current_price
+        // Use the new structure for historical price
+        const historicalPrice = prices[period.key] || crypto.current_price
+
+        // Calculate the date used for this period
+        let dateUsed = new Date()
+        if (period.key === '1d') dateUsed = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+        if (period.key === '1w') dateUsed = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        if (period.key === '1m') dateUsed = new Date(new Date().setMonth(new Date().getMonth() - 1))
+        if (period.key === '1y') dateUsed = new Date(new Date().setFullYear(new Date().getFullYear() - 1))
+
+        // Debug log for transparency
+        console.log(`[ROI DEBUG] Period: ${period.label}, Date Used: ${dateUsed.toISOString().slice(0,10)}, Historical Price: ${historicalPrice}, Current Price: ${crypto.current_price}`)
 
         // Handle case where historical price is 0 or invalid
         if (!historicalPrice || historicalPrice <= 0) {
+          console.warn(`[ROI DEBUG] Invalid historical price for period ${period.key}:`, historicalPrice)
           return {
             invested: investment,
             currentValue: investment,
             profit: 0,
             roi: 0,
             period: period.label,
-          }
+            dateUsed: dateUsed.toISOString().slice(0,10),
+            historicalPrice,
+            currentPrice: crypto.current_price,
+          } as any
         }
 
         const tokensOwned = investment / historicalPrice
@@ -106,9 +134,11 @@ export function ROICalculator() {
           profit,
           roi,
           period: period.label,
-        }
+          dateUsed: dateUsed.toISOString().slice(0,10),
+          historicalPrice,
+          currentPrice: crypto.current_price,
+        } as any
       })
-
       setResults(newResults)
 
       toast({
@@ -116,10 +146,10 @@ export function ROICalculator() {
         description: "Your investment returns have been calculated successfully",
       })
     } catch (error) {
-      console.error("Error calculating ROI:", error)
+      console.error("[ROI DEBUG] Error calculating ROI:", error)
       toast({
         title: "Calculation Failed",
-        description: "Unable to calculate ROI. Please try again.",
+        description: error instanceof Error ? error.message : "Unable to calculate ROI. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -279,6 +309,11 @@ export function ROICalculator() {
                             {result.profit >= 0 ? "+" : ""}
                             {formatCurrency(result.profit)}
                           </p>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">
+                          <div>Date Used: {result.dateUsed}</div>
+                          <div>Historical Price: ${result.historicalPrice?.toLocaleString(undefined, { maximumFractionDigits: 6 })}</div>
+                          <div>Current Price: ${result.currentPrice?.toLocaleString(undefined, { maximumFractionDigits: 6 })}</div>
                         </div>
                       </div>
                     </CardContent>
