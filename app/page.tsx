@@ -194,7 +194,7 @@ export default function HomePage() {
           <div className="container mx-auto px-4 text-center">
             <div className="thought-bubble inline-block">
               <p className="text-black font-bold text-lg lg:text-xl comic-title">
-                © 2024 GYNGER!
+                © 2025 GYNGER!
                 <br />
                 <span className="text-sm lg:text-base">Built with SUPER POWERS! 💪⚡🚀</span>
               </p>
