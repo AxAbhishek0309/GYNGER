@@ -1,0 +1,709 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+/* Comic Book Styles - Readable & Responsive */
+.comic-title {
+  font-family: Impact, "Arial Black", "Franklin Gothic Bold", Arial, sans-serif;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.comic-card {
+  border: 3px solid #000;
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  transform: rotate(-1deg);
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  background: white;
+}
+
+.comic-card:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow: 7px 7px 0px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.comic-card:nth-child(even) {
+  transform: rotate(1deg);
+}
+
+.comic-card:nth-child(even):hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.comic-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px, 15px 15px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.comic-button {
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  font-family: Impact, "Arial Black", sans-serif;
+  transform: rotate(-0.5deg);
+  border-radius: 6px;
+}
+
+.comic-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.comic-button:hover::before {
+  left: 100%;
+}
+
+.comic-button:hover {
+  transform: translate(-2px, -2px) rotate(0deg);
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.4);
+}
+
+.comic-button:active {
+  transform: translate(1px, 1px) rotate(-0.5deg);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.speech-bubble {
+  position: relative;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 20px;
+  padding: 16px 20px;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+  font-family: Impact, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transform: rotate(-0.5deg);
+  line-height: 1.4;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -15px;
+  left: 30px;
+  width: 0;
+  height: 0;
+  border: 15px solid transparent;
+  border-top-color: #fff;
+  border-bottom: 0;
+  margin-left: -15px;
+}
+
+.speech-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -18px;
+  left: 30px;
+  width: 0;
+  height: 0;
+  border: 18px solid transparent;
+  border-top-color: #000;
+  border-bottom: 0;
+  margin-left: -18px;
+}
+
+.thought-bubble {
+  position: relative;
+  background: #f0f8ff;
+  border: 3px solid #000;
+  border-radius: 25px;
+  padding: 12px 16px;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+  transform: rotate(0.5deg);
+  line-height: 1.4;
+}
+
+.thought-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 25px;
+  width: 12px;
+  height: 12px;
+  background: #f0f8ff;
+  border: 3px solid #000;
+  border-radius: 50%;
+}
+
+.thought-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 18px;
+  width: 6px;
+  height: 6px;
+  background: #f0f8ff;
+  border: 2px solid #000;
+  border-radius: 50%;
+}
+
+.pow-effect {
+  animation: pow 0.6s ease-out;
+}
+
+@keyframes pow {
+  0% {
+    transform: scale(1) rotate(-1deg);
+  }
+  50% {
+    transform: scale(1.03) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(-1deg);
+  }
+}
+
+.boom-effect {
+  animation: boom 0.8s ease-out;
+}
+
+@keyframes boom {
+  0% {
+    transform: scale(1) rotate(-0.5deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05) rotate(0.5deg);
+    opacity: 0.95;
+    filter: brightness(1.1);
+  }
+  100% {
+    transform: scale(1) rotate(-0.5deg);
+    opacity: 1;
+  }
+}
+
+.zap-effect {
+  animation: zap 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes zap {
+  0% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+  100% {
+    filter: brightness(1.2) saturate(1.3);
+    transform: scale(1.01);
+  }
+}
+
+.comic-badge {
+  border: 2px solid #000;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+  font-family: Impact, Arial, sans-serif;
+  transform: rotate(-1deg);
+  border-radius: 4px;
+}
+
+.halftone-bg {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 0, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px, 12px 12px;
+  background-position: 0 0, 10px 10px;
+}
+
+.zigzag-border {
+  position: relative;
+  border-bottom: 3px solid #000;
+}
+
+.zigzag-border::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(45deg, transparent 33.333%, #ff6b35 33.333%, #ff6b35 66.667%, transparent 66.667%),
+    linear-gradient(-45deg, transparent 33.333%, #ff6b35 33.333%, #ff6b35 66.667%, transparent 66.667%);
+  background-size: 16px 6px;
+}
+
+/* Comic sound effects - Subtle */
+.sound-effect {
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 2rem;
+  color: #ff6b35;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+  animation: bounce 2s infinite;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+  opacity: 0.7;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  40% {
+    transform: translateY(-8px) rotate(-1deg);
+  }
+  60% {
+    transform: translateY(-4px) rotate(-5deg);
+  }
+}
+
+/* Action lines for dynamic effects - Subtle */
+.action-lines {
+  position: relative;
+  overflow: hidden;
+}
+
+.action-lines::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.08) 3px,
+    rgba(255, 255, 255, 0.08) 6px
+  );
+  pointer-events: none;
+  animation: actionLines 3s linear infinite;
+}
+
+@keyframes actionLines {
+  0% {
+    transform: translateX(-20px);
+  }
+  100% {
+    transform: translateX(20px);
+  }
+}
+
+/* Explosion effect - Subtle */
+.explosion {
+  position: relative;
+}
+
+.explosion::after {
+  content: "💥";
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 1.2rem;
+  animation: explode 3s ease-out infinite;
+  opacity: 0.8;
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(0.9) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9) rotate(360deg);
+    opacity: 0.6;
+  }
+}
+
+/* Star burst effect - Subtle */
+.star-burst {
+  position: relative;
+}
+
+.star-burst::before {
+  content: "⭐";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  font-size: 1rem;
+  animation: starBurst 4s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+@keyframes starBurst {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+/* Tilted crypto cards - Responsive */
+.crypto-card {
+  transform: rotate(-1deg);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.crypto-card:nth-child(2n) {
+  transform: rotate(1deg);
+}
+
+.crypto-card:nth-child(3n) {
+  transform: rotate(-0.5deg);
+}
+
+.crypto-card:nth-child(4n) {
+  transform: rotate(1.5deg);
+}
+
+.crypto-card:hover {
+  transform: rotate(0deg) scale(1.03) translateY(-4px);
+  z-index: 10;
+}
+
+/* Custom scrollbar - Clean */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1c40f;
+  border: 2px solid #000;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e74c3c;
+  border: 2px solid #000;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c0392b;
+}
+
+/* Loading animation */
+.comic-loading {
+  display: inline-block;
+  animation: comicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes comicPulse {
+  0% {
+    transform: scale(1) rotate(-1deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05) rotate(1deg);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1) rotate(-1deg);
+    filter: brightness(1);
+  }
+}
+
+/* Gradient backgrounds for comic panels */
+.comic-panel-1 {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+}
+
+.comic-panel-2 {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.comic-panel-3 {
+  background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+}
+
+.comic-panel-4 {
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+}
+
+.comic-panel-5 {
+  background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+}
+
+/* Text effects - Readable */
+.comic-text-shadow {
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.6);
+}
+
+.comic-glow {
+  text-shadow: 0 0 8px currentColor, 1px 1px 0px rgba(0, 0, 0, 0.6);
+}
+
+/* GYNGER Brand Colors */
+.gynger-primary {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffd700 100%);
+}
+
+.gynger-secondary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gynger-accent {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Responsive Grid Improvements */
+.responsive-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (min-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .comic-title {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    line-height: 1.3;
+  }
+
+  .sound-effect {
+    font-size: 1.5rem;
+    opacity: 0.5;
+  }
+
+  .comic-card {
+    transform: rotate(0deg);
+    margin-bottom: 1rem;
+  }
+
+  .comic-card:hover {
+    transform: scale(1.01) translateY(-2px);
+  }
+
+  .crypto-card {
+    transform: rotate(0deg);
+  }
+
+  .crypto-card:hover {
+    transform: scale(1.01) translateY(-2px);
+  }
+
+  .speech-bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    transform: rotate(0deg);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .comic-button {
+    transform: rotate(0deg);
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .comic-badge {
+    transform: rotate(0deg);
+    font-size: 0.8rem;
+  }
+
+  /* Hide floating elements on mobile */
+  .sound-effect {
+    display: none;
+  }
+
+  /* Reduce background effects on mobile */
+  .halftone-bg {
+    opacity: 0.1;
+  }
+
+  .action-lines::before {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .comic-title {
+    font-size: 1.25rem;
+  }
+
+  .speech-bubble {
+    font-size: 0.8rem;
+    padding: 10px 14px;
+  }
+
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Focus states for accessibility */
+.comic-button:focus {
+  outline: 3px solid #ffd700;
+  outline-offset: 2px;
+}
+
+.comic-card:focus-within {
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .comic-card {
+    border-width: 4px;
+    box-shadow: 6px 6px 0px #000;
+  }
+
+  .comic-button {
+    border-width: 4px;
+    box-shadow: 4px 4px 0px #000;
+  }
+
+  .comic-title {
+    text-shadow: 3px 3px 0px #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .comic-card {
+    transform: none;
+    transition: none;
+  }
+
+  .crypto-card {
+    transform: none;
+  }
+
+  .sound-effect {
+    animation: none;
+  }
+
+  .zap-effect {
+    animation: none;
+  }
+
+  .action-lines::before {
+    animation: none;
+  }
+
+  .explosion::after,
+  .star-burst::before {
+    animation: none;
+  }
+}
