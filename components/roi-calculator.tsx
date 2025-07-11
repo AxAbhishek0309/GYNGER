@@ -192,7 +192,7 @@ export function ROICalculator() {
               <SelectTrigger className="bg-white/5 border-white/10 text-black">
                 <SelectValue placeholder="Choose a cryptocurrency" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-white/10">
+              <SelectContent className="bg-white border-white/10">
                 {cryptoOptions.map((crypto) => (
                   <SelectItem key={crypto.id} value={crypto.id} className="text-black">
                     {crypto.name} ({crypto.symbol.toUpperCase()})
@@ -280,15 +280,14 @@ export function ROICalculator() {
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-black font-semibold">{result.period} Ago</h3>
                         <Badge
-                          variant={result.roi >= 0 ? "default" : "destructive"}
-                          className={result.roi >= 0 ? "bg-green-500/20 text-green-400 border-green-500/30" : ""}
+                          className={`bg-black ${result.roi >= 0 ? "text-green-400" : "text-red-400"} border border-gray-300`}
                         >
                           {result.roi >= 0 ? (
                             <TrendingUp className="w-3 h-3 mr-1" />
                           ) : (
                             <TrendingDown className="w-3 h-3 mr-1" />
                           )}
-                          {formatPercentage(result.roi)}
+                          <span>{formatPercentage(result.roi)}</span>
                         </Badge>
                       </div>
 
