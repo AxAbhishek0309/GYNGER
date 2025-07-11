@@ -100,9 +100,10 @@ export function CryptoChart({ coinId, days = "7" }: CryptoChartProps) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" fontSize={12} />
+            <XAxis dataKey="date" stroke="#000" tick={{ fill: "#000" }} fontSize={12} />
             <YAxis
-              stroke="rgba(255,255,255,0.6)"
+              stroke="#000"
+              tick={{ fill: "#000" }}
               fontSize={12}
               tickFormatter={(value) => `$${value.toLocaleString()}`}
             />

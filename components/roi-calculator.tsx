@@ -171,30 +171,30 @@ export function ROICalculator() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-black">
       {/* Calculator Input */}
       <Card className="bg-white/5 backdrop-blur-md border-white/10">
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
+          <CardTitle className="text-black flex items-center">
             <Calculator className="w-5 h-5 mr-2" />
             ROI Calculator
           </CardTitle>
-          <CardDescription className="text-gray-300">
+          <CardDescription className="text-gray-700">
             Calculate your returns if you invested in crypto at different time periods
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="crypto-select" className="text-white">
+            <Label htmlFor="crypto-select" className="text-black">
               Select Cryptocurrency
             </Label>
             <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white">
+              <SelectTrigger className="bg-white/5 border-white/10 text-black">
                 <SelectValue placeholder="Choose a cryptocurrency" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-white/10">
                 {cryptoOptions.map((crypto) => (
-                  <SelectItem key={crypto.id} value={crypto.id} className="text-white">
+                  <SelectItem key={crypto.id} value={crypto.id} className="text-black">
                     {crypto.name} ({crypto.symbol.toUpperCase()})
                   </SelectItem>
                 ))}
@@ -203,7 +203,7 @@ export function ROICalculator() {
           </div>
 
           <div>
-            <Label htmlFor="investment-amount" className="text-white">
+            <Label htmlFor="investment-amount" className="text-black">
               Investment Amount (USD)
             </Label>
             <Input
@@ -212,7 +212,7 @@ export function ROICalculator() {
               value={investmentAmount}
               onChange={(e) => setInvestmentAmount(e.target.value)}
               placeholder="Enter amount in USD"
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-400"
+              className="bg-white/5 border-white/10 text-black placeholder:text-gray-600"
             />
           </div>
 
@@ -232,7 +232,7 @@ export function ROICalculator() {
           <Button
             onClick={calculateROI}
             disabled={!selectedCrypto || !investmentAmount || calculating}
-            className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600"
+            className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-black"
           >
             {calculating ? (
               <>
@@ -252,11 +252,11 @@ export function ROICalculator() {
       {/* Results */}
       <Card className="bg-white/5 backdrop-blur-md border-white/10">
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
+          <CardTitle className="text-black flex items-center">
             <TrendingUp className="w-5 h-5 mr-2" />
             ROI Results
           </CardTitle>
-          <CardDescription className="text-gray-300">
+          <CardDescription className="text-gray-700">
             Your potential returns across different time periods
           </CardDescription>
         </CardHeader>
@@ -278,7 +278,7 @@ export function ROICalculator() {
                   <Card className="bg-white/5 border-white/10">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-white font-semibold">{result.period} Ago</h3>
+                        <h3 className="text-black font-semibold">{result.period} Ago</h3>
                         <Badge
                           variant={result.roi >= 0 ? "default" : "destructive"}
                           className={result.roi >= 0 ? "bg-green-500/20 text-green-400 border-green-500/30" : ""}
@@ -295,11 +295,11 @@ export function ROICalculator() {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="text-gray-400">Invested</p>
-                          <p className="text-white font-mono">{formatCurrency(result.invested)}</p>
+                          <p className="text-black font-mono">{formatCurrency(result.invested)}</p>
                         </div>
                         <div>
                           <p className="text-gray-400">Current Value</p>
-                          <p className="text-white font-mono">{formatCurrency(result.currentValue)}</p>
+                          <p className="text-black font-mono">{formatCurrency(result.currentValue)}</p>
                         </div>
                         <div className="col-span-2">
                           <p className="text-gray-400">Profit/Loss</p>
