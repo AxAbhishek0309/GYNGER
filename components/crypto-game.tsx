@@ -53,7 +53,9 @@ export function CryptoGame() {
 
     setGameState((prev) => ({ ...prev, isPlaying: true }))
 
-    const result = Math.random() < 0.5 ? "heads" : "tails"
+    const result = Math.random() < 0.6
+      ? selectedSide
+      : (selectedSide === "heads" ? "tails" : "heads")
     setCoinFlip(result)
 
     setTimeout(() => {
