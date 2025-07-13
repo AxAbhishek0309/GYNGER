@@ -1,0 +1,68 @@
+# 🚀 GYNGER Environment Configuration
+
+# ===========================================
+# 🔐 WALLET SETUP (REQUIRED)
+# ===========================================
+
+# Your MetaMask Private Key (for deployment)
+# Get this from MetaMask: Account Details > Export Private Key
+PRIVATE_KEY=your_metamask_private_key_here
+
+# ===========================================
+# 🌐 NETWORK CONFIGURATION
+# ===========================================
+
+# Sepolia Testnet RPC URL (FREE)
+# Get free API key from: https://infura.io/
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
+
+# Mainnet RPC URL (for production)
+MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY
+
+# ===========================================
+# 🔍 BLOCK EXPLORER (OPTIONAL)
+# ===========================================
+
+# Etherscan API Key (for contract verification)
+# Get free API key from: https://etherscan.io/
+ETHERSCAN_API_KEY=your_etherscan_api_key
+
+# ===========================================
+# 🎮 GAME CONFIGURATION
+# ===========================================
+
+# Token Price (in ETH)
+TOKEN_PRICE=0.001
+
+# Max Supply (in tokens)
+MAX_SUPPLY=1000000
+
+# ===========================================
+# 📋 QUICK SETUP STEPS
+# ===========================================
+
+# 1. Install MetaMask: https://metamask.io/
+# 2. Create/Import wallet in MetaMask
+# 3. Add Sepolia Network to MetaMask:
+#    - Network Name: Sepolia Testnet
+#    - RPC URL: https://sepolia.infura.io/v3/YOUR_INFURA_KEY
+#    - Chain ID: 11155111
+#    - Currency: ETH
+# 4. Get free test ETH:
+#    - https://sepoliafaucet.com/
+#    - https://www.infura.io/faucet/sepolia
+#    - https://faucet.sepolia.dev/
+# 5. Export private key from MetaMask
+# 6. Replace 'your_metamask_private_key_here' above
+# 7. Get free API keys from Infura and Etherscan
+# 8. Replace 'YOUR_INFURA_KEY' and 'your_etherscan_api_key' above
+
+# ===========================================
+# 🚨 SECURITY NOTES
+# ===========================================
+
+# ⚠️  NEVER share your private keys
+# ⚠️  Use test wallets for development
+# ⚠️  Keep mainnet wallets separate
+# ⚠️  Backup seed phrases securely
+# ⚠️  This file contains sensitive data - don't commit to git 

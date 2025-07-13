@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WalletConnect } from "@/components/wallet-connect"
 import { CryptoGame } from "@/components/crypto-game"
+import { CryptoGameBlockchain } from "@/components/crypto-game-blockchain"
 import { Dashboard } from "@/components/dashboard"
 import { ROICalculator } from "@/components/roi-calculator"
 import { Leaderboard } from "@/components/leaderboard"
@@ -159,7 +160,7 @@ export default function HomePage() {
               </TabsContent>
 
               <TabsContent value="game" className="mt-6 lg:mt-8">
-                <CryptoGame />
+                <CryptoGameBlockchain />
               </TabsContent>
 
               <TabsContent value="calculator" className="mt-6 lg:mt-8">
