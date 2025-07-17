@@ -1,144 +1,39 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Wallet, Copy, CheckCircle, Zap } from "lucide-react"
 import { motion } from "framer-motion"
-import { useToast } from "@/hooks/use-toast"
-
-interface WalletState {
-  connected: boolean
-  address: string
-  balance: string
-  network: string
-  type: "metamask" | "phantom" | null
-}
+import { useWallet } from "@/components/wallet-context"
+import React from "react"
 
 export function WalletConnect() {
-  const [wallet, setWallet] = useState<WalletState>({
-    connected: false,
-    address: "",
-    balance: "0",
-    network: "",
-    type: null,
-  })
-  const [isConnecting, setIsConnecting] = useState(false)
-  const { toast } = useToast()
+  const {
+    connected,
+    address,
+    balance,
+    network,
+    type,
+    connectMetaMask,
+    connectPhantom,
+    disconnect,
+  } = useWallet()
 
-  const connectMetaMask = async () => {
-    setIsConnecting(true)
-    try {
-      if (typeof window !== "undefined" && (window as any).ethereum) {
-        const accounts = await (window as any).ethereum.request({
-          method: "eth_requestAccounts",
-        })
-
-        if (accounts.length > 0) {
-          const balance = await (window as any).ethereum.request({
-            method: "eth_getBalance",
-            params: [accounts[0], "latest"],
-          })
-
-          const network = await (window as any).ethereum.request({
-            method: "net_version",
-          })
-
-          setWallet({
-            connected: true,
-            address: accounts[0],
-            balance: (Number.parseInt(balance, 16) / 1e18).toFixed(4),
-            network: network === "1" ? "Ethereum Mainnet" : "Ethereum Testnet",
-            type: "metamask",
-          })
-
-          toast({
-            title: "BOOM! MetaMask Connected! 🦊",
-            description: "Your wallet is now connected and ready for action!",
-          })
-        }
-      } else {
-        toast({
-          title: "OOPS! MetaMask Not Found! 😱",
-          description: "Please install MetaMask extension to continue!",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("MetaMask connection error:", error)
-      toast({
-        title: "OH NO! Connection Failed! 💥",
-        description: "Failed to connect to MetaMask. Try again!",
-        variant: "destructive",
-      })
-    }
-    setIsConnecting(false)
-  }
-
-  const connectPhantom = async () => {
-    setIsConnecting(true)
-    try {
-      if (typeof window !== "undefined" && (window as any).solana) {
-        const response = await (window as any).solana.connect()
-
-        setWallet({
-          connected: true,
-          address: response.publicKey.toString(),
-          balance: "0.0000",
-          network: "Solana Mainnet",
-          type: "phantom",
-        })
-
-        toast({
-          title: "KAPOW! Phantom Connected! 👻",
-          description: "Your Solana wallet is ready to rock!",
-        })
-      } else {
-        toast({
-          title: "WHOOPS! Phantom Not Found! 👻",
-          description: "Please install Phantom wallet extension!",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("Phantom connection error:", error)
-      toast({
-        title: "YIKES! Connection Failed! ⚡",
-        description: "Failed to connect to Phantom wallet. Try again!",
-        variant: "destructive",
-      })
-    }
-    setIsConnecting(false)
-  }
-
-  const disconnect = () => {
-    setWallet({
-      connected: false,
-      address: "",
-      balance: "0",
-      network: "",
-      type: null,
-    })
-    toast({
-      title: "BYE! Wallet Disconnected! 👋",
-      description: "Your wallet has been safely disconnected!",
-    })
-  }
+  const [isConnecting, setIsConnecting] = React.useState(false)
 
   const copyAddress = () => {
-    navigator.clipboard.writeText(wallet.address)
-    toast({
-      title: "COPIED! Address Saved! 📋",
-      description: "Wallet address copied to clipboard!",
-    })
+    if (address) {
+      navigator.clipboard.writeText(address)
+      // Optionally, show a toast here if you want
+    }
   }
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
-  if (wallet.connected) {
+  if (connected) {
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md">
         <Card className="comic-card bg-gradient-to-br from-green-300 to-blue-400">
@@ -149,9 +44,9 @@ export function WalletConnect() {
                 WALLET CONNECTED!
               </CardTitle>
               <Badge
-                className={`comic-badge text-white ${wallet.type === "metamask" ? "bg-orange-500" : "bg-purple-500"}`}
+                className={`comic-badge text-white ${type === "metamask" ? "bg-orange-500" : "bg-purple-500"}`}
               >
-                {wallet.type === "metamask" ? "🦊 METAMASK" : "👻 PHANTOM"}
+                {type === "metamask" ? "🦊 METAMASK" : "👻 PHANTOM"}
               </Badge>
             </div>
           </CardHeader>
@@ -162,7 +57,7 @@ export function WalletConnect() {
                   <p className="text-sm text-black font-bold mb-1">WALLET ADDRESS</p>
                   <div className="flex items-center space-x-2">
                     <code className="text-black bg-white border-2 border-black px-3 py-2 rounded font-bold">
-                      {formatAddress(wallet.address)}
+                      {formatAddress(address)}
                     </code>
                     <Button
                       size="sm"
@@ -177,13 +72,13 @@ export function WalletConnect() {
                 <div>
                   <p className="text-sm text-black font-bold mb-1">BALANCE</p>
                   <p className="text-black font-bold text-lg">
-                    {wallet.balance} {wallet.type === "metamask" ? "ETH ⚡" : "SOL ☀️"}
+                    {balance} {type === "metamask" ? "ETH ⚡" : "SOL ☀️"}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-black font-bold mb-1">NETWORK</p>
-                  <p className="text-black font-bold">{wallet.network}</p>
+                  <p className="text-black font-bold">{network}</p>
                 </div>
               </div>
             </div>
@@ -218,7 +113,11 @@ export function WalletConnect() {
             </CardHeader>
             <CardContent>
               <Button
-                onClick={connectMetaMask}
+                onClick={async () => {
+                  setIsConnecting(true)
+                  await connectMetaMask()
+                  setIsConnecting(false)
+                }}
                 disabled={isConnecting}
                 className="comic-button w-full bg-orange-500 hover:bg-orange-400 text-white font-bold text-lg h-12"
               >
@@ -250,7 +149,11 @@ export function WalletConnect() {
             </CardHeader>
             <CardContent>
               <Button
-                onClick={connectPhantom}
+                onClick={async () => {
+                  setIsConnecting(true)
+                  await connectPhantom()
+                  setIsConnecting(false)
+                }}
                 disabled={isConnecting}
                 className="comic-button w-full bg-purple-500 hover:bg-purple-400 text-white font-bold text-lg h-12"
               >

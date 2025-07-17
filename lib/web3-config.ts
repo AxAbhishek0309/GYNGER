@@ -61,7 +61,7 @@ export const CONTRACT_ADDRESSES = {
       gameToken: '0x...', // Deploy and add your contract address
     },
     sepolia: {
-      gameToken: '0x...', // Deploy and add your contract address
+      gameToken: '0xa8513A0b3160c3C8B463CCBb3C85Db31Aa2DE2ac', // Deploy and add your contract address
     },
     localhost: {
       gameToken: '0x5FbDB2315678afecb367f032d93F642f64180aa3', // Default Hardhat address

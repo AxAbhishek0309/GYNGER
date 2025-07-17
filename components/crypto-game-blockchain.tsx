@@ -10,6 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion, AnimatePresence } from "framer-motion"
 import { Coins, Trophy, Zap, Star, Target, Wallet, CircleDollarSign, Sun } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { ethers } from "ethers"
+import GameTokenABI from "../artifacts/contracts/GameToken.sol/GameToken.json"
+import { CONTRACT_ADDRESSES } from "@/lib/web3-config"
 
 interface GameState {
   balance: string
@@ -28,6 +31,13 @@ interface Reward {
 }
 
 type Blockchain = "ethereum" | "solana"
+
+// Helper to get ethers.Contract instance for GameToken
+function getGameTokenContract(signerOrProvider: ethers.Signer | ethers.providers.Provider) {
+  // Use Sepolia for now; you can make this dynamic if needed
+  const address = CONTRACT_ADDRESSES.ethereum.sepolia.gameToken
+  return new ethers.Contract(address, GameTokenABI.abi, signerOrProvider)
+}
 
 export function CryptoGameBlockchain() {
   const [gameState, setGameState] = useState<GameState>({
@@ -50,6 +60,9 @@ export function CryptoGameBlockchain() {
   const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
 
+  // Add networkName state
+  const [networkName, setNetworkName] = useState<string>("-");
+
   const { toast } = useToast()
 
   const tokens = [
@@ -59,36 +72,85 @@ export function CryptoGameBlockchain() {
     { name: "BTC", icon: "🪙", multiplier: 3 },
   ]
 
-  // Simulated blockchain integration
+  // Real blockchain integration for wallet connection
   const connectWallet = async () => {
-    try {
-      // Simulate wallet connection
-      const mockAddress = selectedBlockchain === "ethereum" 
-        ? "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
-        : "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
-      
-      setWalletAddress(mockAddress)
-      setIsWalletConnected(true)
-      
-      // Simulate balance fetch
-      setGameState(prev => ({
-        ...prev,
-        balance: selectedBlockchain === "ethereum" ? "0.5" : "2.5",
-        tokenBalance: "1000",
-      }))
+    if (selectedBlockchain === "ethereum") {
+      if (typeof window !== "undefined" && (window as any).ethereum) {
+        try {
+          const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+          const address = accounts[0];
+          setWalletAddress(address);
+          setIsWalletConnected(true);
 
-      toast({
-        title: "Wallet Connected! 🎉",
-        description: `Connected to ${mockAddress.slice(0, 6)}...${mockAddress.slice(-4)}`,
-      })
-    } catch (error) {
-      toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
-        variant: "destructive",
-      })
+          // Get balance
+          const balanceHex = await (window as any).ethereum.request({
+            method: "eth_getBalance",
+            params: [address, "latest"],
+          });
+          const balance = parseInt(balanceHex, 16) / 1e18;
+          setGameState(prev => ({
+            ...prev,
+            balance: balance.toFixed(4),
+            // tokenBalance: ... (fetch from contract if needed)
+          }));
+
+          // Get network
+          const chainId = await (window as any).ethereum.request({ method: "eth_chainId" });
+          // 0x1 = Mainnet, 0xaa36a7 = Sepolia
+          let network = "Ethereum Mainnet";
+          if (chainId === "0xaa36a7") network = "Sepolia Testnet";
+          setNetworkName(network);
+
+          toast({
+            title: "Wallet Connected! 🎉",
+            description: `Connected to ${address.slice(0, 6)}...${address.slice(-4)}`,
+          });
+        } catch (error) {
+          toast({
+            title: "Connection Failed",
+            description: "Failed to connect wallet. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "MetaMask Not Found",
+          description: "Please install MetaMask extension to continue.",
+          variant: "destructive",
+        });
+      }
+    } else if (selectedBlockchain === "solana") {
+      if (typeof window !== "undefined" && (window as any).solana) {
+        try {
+          const response = await (window as any).solana.connect();
+          const address = response.publicKey.toString();
+          setWalletAddress(address);
+          setIsWalletConnected(true);
+          setNetworkName("Solana Mainnet");
+          setGameState(prev => ({
+            ...prev,
+            balance: "0.0000", // Optionally fetch real SOL balance
+          }));
+          toast({
+            title: "Phantom Connected! 👻",
+            description: `Connected to ${address.slice(0, 6)}...${address.slice(-4)}`,
+          });
+        } catch (error) {
+          toast({
+            title: "Connection Failed",
+            description: "Failed to connect Phantom wallet. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Phantom Not Found",
+          description: "Please install Phantom wallet extension!",
+          variant: "destructive",
+        });
+      }
     }
-  }
+  };
 
   const disconnectWallet = () => {
     setWalletAddress(null)
@@ -114,7 +176,6 @@ export function CryptoGameBlockchain() {
       })
       return
     }
-
     try {
       const amount = parseFloat(purchaseAmount)
       if (amount <= 0) {
@@ -125,34 +186,40 @@ export function CryptoGameBlockchain() {
         })
         return
       }
-
-      // Simulate blockchain transaction
-      toast({
-        title: "Transaction Sent! 🚀",
-        description: "Your token purchase is being processed...",
-      })
-
-      // Simulate transaction delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      const tokensToMint = amount * 1000 // 1 SOL/ETH = 1000 tokens
-      const newTokenBalance = parseFloat(gameState.tokenBalance) + tokensToMint
-      const newBalance = parseFloat(gameState.balance) - amount
-
-      setGameState(prev => ({
-        ...prev,
-        balance: newBalance.toFixed(4),
-        tokenBalance: newTokenBalance.toFixed(4),
-      }))
-
-      toast({
-        title: "Tokens Purchased! 🎉",
-        description: `Successfully purchased ${tokensToMint.toFixed(4)} tokens!`,
-      })
-    } catch (error) {
+      const tokensToMint = amount * 10000
+      if (tokensToMint > 10000) {
+        toast({
+          title: "Purchase Limit Exceeded",
+          description: "You cannot purchase more than 10,000 tokens in a single transaction.",
+          variant: "destructive",
+        })
+        return
+      }
+      // Real on-chain transaction for Ethereum only
+      if (selectedBlockchain === "ethereum") {
+        if (typeof window !== "undefined" && (window as any).ethereum) {
+          const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+          const signer = provider.getSigner()
+          const contract = getGameTokenContract(signer)
+          const tx = await contract.purchaseTokens({ value: ethers.utils.parseEther(purchaseAmount) })
+          toast({
+            title: "Transaction Sent! 🚀",
+            description: `Tx Hash: ${tx.hash}`,
+          })
+          await tx.wait()
+          toast({
+            title: "Tokens Purchased! 🎉",
+            description: `Successfully purchased ${tokensToMint.toFixed(4)} tokens!`,
+          })
+          // TODO: Optionally update token balance by reading from contract
+        }
+      } else {
+        // TODO: Integrate real Solana purchase logic here
+      }
+    } catch (error: any) {
       toast({
         title: "Purchase Failed",
-        description: "Failed to purchase tokens. Please try again.",
+        description: error?.message || "Failed to purchase tokens. Please try again.",
         variant: "destructive",
       })
     }
@@ -160,10 +227,8 @@ export function CryptoGameBlockchain() {
 
   const playGame = async () => {
     if (!selectedSide || !isWalletConnected) return
-
     const betAmountNum = parseFloat(betAmount)
     const tokenBalanceNum = parseFloat(gameState.tokenBalance)
-
     if (betAmountNum > tokenBalanceNum) {
       toast({
         title: "Insufficient Tokens",
@@ -172,85 +237,55 @@ export function CryptoGameBlockchain() {
       })
       return
     }
-
     setGameState((prev) => ({ ...prev, isPlaying: true }))
-
-    // Simulate blockchain transaction
-    toast({
-      title: "Game Transaction Sent! 🎮",
-      description: "Your game transaction is being processed...",
-    })
-
-    // Simulate transaction delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    const result = Math.random() < 0.6
-      ? selectedSide
-      : (selectedSide === "heads" ? "tails" : "heads")
-    setCoinFlip(result)
-
-    setTimeout(() => {
-      const won = result === selectedSide
-      const winAmount = won ? betAmountNum * 2 : 0
-      const newTokenBalance = tokenBalanceNum - betAmountNum + winAmount
-
-      setGameState((prev) => ({
-        ...prev,
-        tokenBalance: newTokenBalance.toFixed(4),
-        totalWins: won ? prev.totalWins + 1 : prev.totalWins,
-        totalGames: prev.totalGames + 1,
-        streak: won ? prev.streak + 1 : 0,
-        isPlaying: false,
-        lastResult: won ? "win" : "lose",
-      }))
-
-      if (won) {
-        const randomToken = tokens[Math.floor(Math.random() * tokens.length)]
-        const rewardAmount = (betAmountNum / 100) * randomToken.multiplier
-
-        const newReward: Reward = {
-          token: randomToken.name,
-          amount: rewardAmount,
-          icon: randomToken.icon,
+    try {
+      if (selectedBlockchain === "ethereum") {
+        if (typeof window !== "undefined" && (window as any).ethereum) {
+          const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+          const signer = provider.getSigner()
+          const contract = getGameTokenContract(signer)
+          // playerChoice: true for heads, false for tails
+          const playerChoice = selectedSide === "heads"
+          const tx = await contract.playGame(betAmountNum, playerChoice)
+          toast({
+            title: "Game Transaction Sent! 🎮",
+            description: `Tx Hash: ${tx.hash}`,
+          })
+          await tx.wait()
+          toast({
+            title: "Game Played!",
+            description: `Bet ${betAmountNum} tokens on ${selectedSide}.`,
+          })
+          // TODO: Optionally update token balance and fetch event details
         }
-
-        setRewards((prev) => [newReward, ...prev.slice(0, 4)])
-
-        toast({
-          title: "KAPOW! YOU WON! 🎉💥",
-          description: `Won ${winAmount.toFixed(4)} tokens + ${rewardAmount.toFixed(4)} ${randomToken.name}!`,
-        })
       } else {
-        toast({
-          title: "OUCH! You Lost! 😵",
-          description: `Lost ${betAmountNum.toFixed(4)} tokens. Try again, hero!`,
-          variant: "destructive",
-        })
+        // TODO: Integrate real Solana game logic here
       }
-
-      setShowResult(true)
-      setTimeout(() => {
-        setShowResult(false)
-        setCoinFlip(null)
-        setSelectedSide(null)
-      }, 3000)
-    }, 2000)
+    } catch (error: any) {
+      toast({
+        title: "Game Failed",
+        description: error?.message || "Failed to play game. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setGameState((prev) => ({ ...prev, isPlaying: false }))
+    }
   }
 
   const resetGame = () => {
-    setGameState({
-      balance: "0",
-      tokenBalance: "0",
+    setGameState(prev => ({
+      ...prev,
       totalWins: 0,
       totalGames: 0,
       streak: 0,
       isPlaying: false,
       lastResult: null,
-    })
+      // Do NOT reset balance or tokenBalance
+    }))
     setRewards([])
     toast({
       title: "RESET! Fresh Start! 🔄",
-      description: "Starting fresh! Let's go!",
+      description: "Game stats reset. Your token balance is preserved!",
     })
   }
 
@@ -353,13 +388,20 @@ export function CryptoGameBlockchain() {
                 value={purchaseAmount}
                 onChange={(e) => setPurchaseAmount(e.target.value)}
                 className="flex-1"
+                min="0.0001"
+                max="1"
+                step="0.0001"
               />
               <Button onClick={purchaseTokens} className="comic-button bg-green-500 hover:bg-green-400">
                 Buy Tokens
               </Button>
             </div>
             <div className="text-sm text-black font-bold">
-              Price: 1 {selectedBlockchain === "ethereum" ? "ETH" : "SOL"} = 1000 GYNGER tokens
+              Price: 1 {selectedBlockchain === "ethereum" ? "ETH" : "SOL"} = 10,000 GYNGER tokens<br />
+              <span style={{ color: '#d32f2f' }}>Max 10,000 tokens per purchase (e.g., max 1 ETH/SOL per transaction)</span>
+            </div>
+            <div className="text-xs text-black mt-2">
+              <b>Network:</b> {networkName}
             </div>
           </CardContent>
         </Card>
@@ -591,6 +633,7 @@ export function CryptoGameBlockchain() {
           </Card>
         </div>
       </div>
+      {/* TODO: Add event listeners to fetch/display real transaction history from contract events */}
     </div>
   )
 }

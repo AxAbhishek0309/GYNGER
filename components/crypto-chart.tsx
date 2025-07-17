@@ -32,6 +32,10 @@ export function CryptoChart({ coinId, days = "7" }: CryptoChartProps) {
 
   useEffect(() => {
     fetchChartData()
+    const interval = setInterval(() => {
+      fetchChartData()
+    }, 60000) // 60 seconds
+    return () => clearInterval(interval)
   }, [coinId, days])
 
   const fetchChartData = async () => {

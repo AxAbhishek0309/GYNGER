@@ -6,15 +6,16 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract GameToken is ERC20, Ownable, ReentrancyGuard {
-    uint256 public tokenPrice = 0.001 ether; // 0.001 ETH per token
+    uint256 public tokenPrice = 0.0001 ether; // 0.0001 ETH per token (0.1 ETH = 1,000 tokens)
     uint256 public maxSupply = 1000000 * 10**18; // 1 million tokens
     
     mapping(address => uint256) public userBalance;
     mapping(address => uint256) public totalWins;
     mapping(address => uint256) public totalGames;
     
-    event TokensPurchased(address indexed buyer, uint256 amount, uint256 cost);
-    event GamePlayed(address indexed player, bool won, uint256 betAmount, uint256 winAmount);
+    event TokensPurchased(address indexed buyer, uint256 amount, uint256 cost, uint256 timestamp);
+    event GamePlayed(address indexed player, bool won, uint256 betAmount, uint256 winAmount, bool playerChoice, bool coinResult, uint256 timestamp);
+    event ETHWithdrawn(address indexed owner, uint256 amount, uint256 timestamp);
     
     constructor() ERC20("Gynger Game Token", "GYNGER") {
         _mint(msg.sender, 100000 * 10**18); // Initial supply
@@ -25,12 +26,13 @@ contract GameToken is ERC20, Ownable, ReentrancyGuard {
         require(msg.value >= tokenPrice, "Insufficient ETH for minimum purchase");
         
         uint256 tokensToMint = (msg.value * 10**18) / tokenPrice;
+        require(tokensToMint <= 10000 * 10**18, "Cannot purchase more than 10,000 tokens per transaction");
         require(totalSupply() + tokensToMint <= maxSupply, "Exceeds max supply");
         
         _mint(msg.sender, tokensToMint);
         userBalance[msg.sender] += tokensToMint;
         
-        emit TokensPurchased(msg.sender, tokensToMint, msg.value);
+        emit TokensPurchased(msg.sender, tokensToMint, msg.value, block.timestamp);
     }
     
     function playGame(uint256 betAmount, bool playerChoice) external nonReentrant {
@@ -59,11 +61,13 @@ contract GameToken is ERC20, Ownable, ReentrancyGuard {
         totalWins[msg.sender] += won ? 1 : 0;
         totalGames[msg.sender] += 1;
         
-        emit GamePlayed(msg.sender, won, betAmount, won ? betAmount * 2 : 0);
+        emit GamePlayed(msg.sender, won, betAmount, won ? betAmount * 2 : 0, playerChoice, coinResult, block.timestamp);
     }
     
     function withdrawETH() external onlyOwner {
-        payable(owner()).transfer(address(this).balance);
+        uint256 amount = address(this).balance;
+        payable(owner()).transfer(amount);
+        emit ETHWithdrawn(owner(), amount, block.timestamp);
     }
     
     function setTokenPrice(uint256 newPrice) external onlyOwner {
